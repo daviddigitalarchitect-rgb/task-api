@@ -1,8 +1,8 @@
-# 📝 Tasks API - Phase 1
+# Tasks API - Phase 1
 
 This is a **REST API** built to manage tasks. It uses a "Bouncer" (Zod) to make sure all data is clean and valid before it enters our database.
 
-## 🚀 How to Run
+## How to Run
 1. Open your terminal in the `tasks-api` folder.
 2. Run `npm install` to get the tools.
 3. Run **`npm start`** to wake up the server.
@@ -25,7 +25,7 @@ This is a **REST API** built to manage tasks. It uses a "Bouncer" (Zod) to make 
 
 ---
 
-## 🛡 Features
+## Features
 * **Validation:** Uses **Zod** to block empty titles or invalid priority levels.
 * **IDs:** Every task gets a unique **UUID** barcode.
 * **Timestamps:** Automatically records when a task is created and when it is last updated.
@@ -33,7 +33,7 @@ This is a **REST API** built to manage tasks. It uses a "Bouncer" (Zod) to make 
 
 ---
 
-### 🛠 Tools Used
+### Tools Used
 * **Node.js & Express**
 * **Zod** (The Bouncer/Auditor)
 * **UUID** (The ID Maker)
