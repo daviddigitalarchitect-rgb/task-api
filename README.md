@@ -10,7 +10,7 @@ This is a **REST API** built to manage tasks. It uses a "Bouncer" (Zod) to make 
 
 ---
 
-## 🛤 API Routes
+## API Routes
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
