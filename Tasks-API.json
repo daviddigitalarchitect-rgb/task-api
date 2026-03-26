@@ -1,0 +1,18 @@
+{
+  "info": {
+    "_postman_id": "717ae654-426b-462f-8bc8-5ed410b4ed15",
+    "name": "Tasks API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53447814"
+  },
+  "item": [
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    }
+  ]
+}
