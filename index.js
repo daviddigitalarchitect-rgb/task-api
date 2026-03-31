@@ -158,6 +158,10 @@ app.delete('/tasks', (req, res) => {
 });
 
 
-app.listen(3000, () => {
-  console.log('Server is awake and listening on http://localhost:3000');
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(3000, () => {
+    console.log('Server is awake and listening on http://localhost:3000');
+  });
+}
+
+module.exports = app;
