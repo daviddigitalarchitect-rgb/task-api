@@ -1,4 +1,3 @@
-const { v4: uuidv4 } = require('uuid');
 const { z } = require('zod');
 
 // --- THE SCHEMA ---
@@ -10,70 +9,45 @@ const userSchema = z.object({
 const UserController = (userRepo, taskRepo) => {
   return {
 
-    createUser: (req, res) => {
+    createUser: async (req, res) => {
       const validationResult = userSchema.safeParse(req.body);
       if (!validationResult.success) return res.status(400).json({ error: validationResult.error.issues[0].message });
       
-      const currentUsers = userRepo.getUsers();
-      if (currentUsers.some(user => user.email === validationResult.data.email)) {
-        return res.status(409).json({ error: "A user with this email already exists." });
+      try {
+        const newUser = await userRepo.create(validationResult.data);
+        res.status(201).json(newUser);
+      } catch (error) {
+        if (error.message.includes('already exists')) {
+          return res.status(409).json({ error: error.message });
+        }
+        return res.status(500).json({ error: "Internal Server Error" });
       }
-      
-      const newUser = {
-        id: uuidv4(),
-        name: validationResult.data.name,
-        email: validationResult.data.email,
-        createdAt: new Date().toISOString()
-      };
-      
-      currentUsers.push(newUser);
-      userRepo.saveUsers(currentUsers);
-      res.status(201).json(newUser);
     },
 
-    getAllUsers: (req, res) => {
-      res.status(200).json(userRepo.getUsers());
+    getAllUsers: async (req, res) => {
+      const users = await userRepo.findAll();
+      res.status(200).json(users);
     },
 
-    getUserTasks: (req, res) => {
+    getUserTasks: async (req, res) => {
       const targetUserId = req.params.id;
       
-      const allUsers = userRepo.getUsers();
-      const allTasks = taskRepo.getTasks();
-      
-      const targetUser = allUsers.find(user => user.id === targetUserId);
+      const targetUser = await userRepo.findById(targetUserId);
       if (!targetUser) return res.status(404).json({ error: "User not found" });
       
-      const userTasks = allTasks.filter(task => task.assignedTo === targetUserId);
+      const userTasks = await taskRepo.findByUserId(targetUserId);
       res.status(200).json({
         user: { id: targetUser.id, name: targetUser.name },
         tasks: userTasks,
         taskCount: userTasks.length
       });
     },
-    getUserTasks: (req, res) => {
-    }, 
     
-    getUserById: (req, res) => {
-      const currentUsers = userRepo.getUsers();
-      const foundUser = currentUsers.find(user => user.id === req.params.id);
+    getUserById: async (req, res) => {
+      const foundUser = await userRepo.findById(req.params.id);
       
       if (foundUser) {
         res.status(200).json(foundUser);
-      } else {
-        res.status(404).json({ error: "User not found" });
-      }
-    },
-
-    // --- NEW FEATURE: Delete a user ---
-    deleteUser: (req, res) => {
-      const currentUsers = userRepo.getUsers();
-      const userIndex = currentUsers.findIndex(user => user.id === req.params.id);
-
-      if (userIndex !== -1) {
-        currentUsers.splice(userIndex, 1);
-        userRepo.saveUsers(currentUsers);
-        res.status(204).send(); // 204 means "Success, but no content to return"
       } else {
         res.status(404).json({ error: "User not found" });
       }
