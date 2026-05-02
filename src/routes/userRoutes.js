@@ -7,7 +7,7 @@ const UserRouter = (userController) => {
   router.get('/', userController.getAllUsers);
   router.get('/:id/tasks', userController.getUserTasks);
   router.get('/:id', userController.getUserById);
-  // router.delete('/:id', userController.deleteUser);
+  router.delete('/:id', userController.deleteUser);
   
   return router;
 };

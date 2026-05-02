@@ -52,6 +52,16 @@ class FileUserRepository extends IUserRepository {
     await this._writeUsers(users);
     return newUser;
   }
+
+  async delete(id) {
+    const users = await this._readUsers();
+    const filteredUsers = users.filter(u => u.id !== id);
+    
+    if (users.length === filteredUsers.length) return false; 
+    
+    await this._writeUsers(filteredUsers);
+    return true;
+  }
 }
 
 module.exports = FileUserRepository;

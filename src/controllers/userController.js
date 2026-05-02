@@ -51,6 +51,15 @@ const UserController = (userRepo, taskRepo) => {
       } else {
         res.status(404).json({ error: "User not found" });
       }
+    },
+
+    deleteUser: async (req, res) => {
+      const success = await userRepo.delete(req.params.id);
+      if (success) {
+        res.status(204).send(); 
+      } else {
+        res.status(404).json({ error: "User not found" });
+      }
     }
   };
 };
