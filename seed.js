@@ -1,34 +1,38 @@
-const fs = require('fs');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+// --- SEED CONFIGURATION ---
+const USER_ID = "fb592b4a-f69d-4423-bfbc-a817a2ea52d7"; 
+const SEED_COUNT = 100; 
 
-const tasksFilePath = path.join(__dirname, 'tasks.json');
+console.log(`Preparing to plant ${SEED_COUNT} tasks into the cloud...`);
 
-const davidUserId = "29e2da35-c868-4784-b3bd-1d6d2cf88e4f";
+const seedDatabase = async () => {
+    const promises = [];
+    const priorities = ["low", "medium", "high"];
 
-const possibleUsers = [uuidv4(), uuidv4(), uuidv4(), uuidv4(), davidUserId];
-const statuses = ["pending", "done"];
-const priorities = ["low", "medium", "high"];
+    for (let i = 1; i <= SEED_COUNT; i++) {
+        const randomPriority = priorities[Math.floor(Math.random() * priorities.length)];
+        const isDone = i % 2 === 0;
 
-let massiveTaskArray = [];
+        const request = fetch('http://localhost:3000/tasks', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: `Seeded Survey Task #${i}`,
+                description: `Generated test data for filtering.`,
+                priority: randomPriority,
+                done: isDone,
+                userId: USER_ID
+            })
+        });
+        promises.push(request);
+    }
 
-console.log("Starting construction: Generating 10,000 tasks...");
+    try {
+        await Promise.all(promises);
+        console.log(`Success! ${SEED_COUNT} tasks successfully planted in Neon Postgres.`);
+        console.log(`Next Step: Open Postman and test your filters!`);
+    } catch (error) {
+        console.error("Seeding failed:", error);
+    }
+};
 
-for (let i = 0; i < 10000; i++) {
-  const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-  const randomPriority = priorities[Math.floor(Math.random() * priorities.length)];
-  const randomUser = possibleUsers[Math.floor(Math.random() * possibleUsers.length)];
-
-  massiveTaskArray.push({
-    id: uuidv4(),
-    title: `Stress Test Task #${i + 1}`,
-    priority: randomPriority,
-    status: randomStatus,
-    assignedTo: randomUser,
-    createdAt: new Date().toISOString()
-  });
-}
-
-fs.writeFileSync(tasksFilePath, JSON.stringify(massiveTaskArray, null, 2), 'utf8');
-
-console.log("Successfully seeded 10,000 tasks into tasks.json! Prepare for lag.");
+seedDatabase();

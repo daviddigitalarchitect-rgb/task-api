@@ -6,16 +6,20 @@ const taskSchema = z.object({
     required_error: "Oops! You forgot to add a title.",
     invalid_type_error: "The title must be plain text."
   }).min(1, "The title cannot be blank."),
+  description: z.string().optional(),
   priority: z.enum(["low", "medium", "high"], {
     errorMap: () => ({ message: "Priority must be exactly 'low', 'medium', or 'high'." })
-  }).optional()
+  }).optional(),
+  done: z.boolean().optional(),
+  userId: z.string().uuid("Invalid User ID format")
 });
 
 const updateSchema = z.object({
   title: z.string().min(1, "The title cannot be blank.").optional(),
   priority: z.enum(["low", "medium", "high"]).optional(),
   status: z.enum(["pending", "done"]).optional(),
-  assignedTo: z.string().uuid().optional()
+  assignedTo: z.string().uuid().optional(),
+  done: z.boolean().optional()
 });
 
 // --- THE MANAGER ---
@@ -25,12 +29,9 @@ const TaskController = (taskRepo) => {
     createTask: async (req, res) => {
       const validationResult = taskSchema.safeParse(req.body);
       if (!validationResult.success) {
-        let errorMessage = validationResult.error.issues[0].message;
-        if (errorMessage.includes("expected string") || errorMessage.includes("Required")) {
-          errorMessage = "Oops! You forgot to add a title.";
-        }
+        const errorMessage = validationResult.error.issues[0].message;
         return res.status(400).json({ error: errorMessage });
-      }
+    }
       
       const newTask = await taskRepo.create(validationResult.data);       
       res.status(201).json(newTask);

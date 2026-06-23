@@ -17,9 +17,10 @@ const UserController = (userRepo, taskRepo) => {
         const newUser = await userRepo.create(validationResult.data);
         res.status(201).json(newUser);
       } catch (error) {
-        if (error.message.includes('already exists')) {
-          return res.status(409).json({ error: error.message });
+        if (error.message?.includes('already exists') || error.code === '23505') {
+          return res.status(409).json({ error: "A user with this email already exists." });
         }
+        console.error("DATABASE ERROR:", error);
         return res.status(500).json({ error: "Internal Server Error" });
       }
     },
@@ -27,6 +28,7 @@ const UserController = (userRepo, taskRepo) => {
     getAllUsers: async (req, res) => {
       const users = await userRepo.findAll();
       res.status(200).json(users);
+
     },
 
     getUserTasks: async (req, res) => {

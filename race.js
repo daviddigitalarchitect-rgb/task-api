@@ -7,9 +7,10 @@ const fireRequest = async (index) => {
     const response = await fetch('http://localhost:3000/tasks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+     body: JSON.stringify({
         title: `Race Condition Task #${index}`,
-        priority: "high"
+        priority: "high",
+        userId: "fad96c61-0d2f-484b-b435-0f133973b20f" 
       })
     });
     return response.status;

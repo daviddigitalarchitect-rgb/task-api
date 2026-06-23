@@ -1,14 +1,21 @@
-const FileTaskRepository = require('./repositories/file/FileTaskRepository');
 const FileUserRepository = require('./repositories/file/FileUserRepository');
+const FileTaskRepository = require('./repositories/file/FileTaskRepository');
 
-const getRepositories = () => {
+const PostgresUserRepository = require('./repositories/PostgresUserRepository');
+const PostgresTaskRepository = require('./repositories/PostgresTaskRepository');
 
-  const dataSource = process.env.DATA_SOURCE || 'file';
-
+const getRepositories = (dataSource) => {
   if (dataSource === 'file') {
     return {
-      taskRepo: new FileTaskRepository(),
-      userRepo: new FileUserRepository()
+      userRepository: new FileUserRepository(),
+      taskRepository: new FileTaskRepository()
+    };
+  }
+  
+  if (dataSource === 'postgres') {
+    return {
+      userRepository: new PostgresUserRepository(),
+      taskRepository: new PostgresTaskRepository()
     };
   }
 

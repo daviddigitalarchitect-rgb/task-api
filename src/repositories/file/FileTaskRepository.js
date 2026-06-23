@@ -66,7 +66,8 @@ class FileTaskRepository extends ITaskRepository {
     const newTask = {
       id: uuidv4(),
       ...taskData,
-      status: taskData.status || 'pending',
+      priority: taskData.priority || null,
+      status: taskData.done || 'pending',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -93,8 +94,17 @@ class FileTaskRepository extends ITaskRepository {
   }
 
   async markDone(id) {
-    return this.update(id, { status: 'completed' });
-  }
+        const tasks = await this._readTasks();
+        const taskIndex = tasks.findIndex(t => t.id === id);
+
+        if (taskIndex === -1) return null;
+
+        tasks[taskIndex].done = true; 
+        tasks[taskIndex].updatedAt = new Date().toISOString();
+        await this._writeTasks(tasks);
+        
+        return tasks[taskIndex];
+    }
 
   async delete(id) {
     const tasks = await this._readTasks();

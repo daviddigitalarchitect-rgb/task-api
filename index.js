@@ -1,8 +1,13 @@
+require('dotenv').config();
+
 // 1. Import the Building
 const app = require('./src/app');
 
 // 2. Import the Factory
 const { getRepositories } = require('./src/factory');
+
+const { connectDB } = require('./src/db/postgres');
+
 
 // 3. Import the Managers (Controllers)
 const TaskController = require('./src/controllers/taskController');
@@ -13,12 +18,16 @@ const TaskRouter = require('./src/routes/taskRoutes');
 const UserRouter = require('./src/routes/userRoutes');
 
 
+
 // --- THE WIRING ---
+if (process.env.DATA_SOURCE === 'postgres') {
+    connectDB();
+}
 
-const { taskRepo, userRepo } = getRepositories();
+const { taskRepository, userRepository } = getRepositories(process.env.DATA_SOURCE);
 
-const taskController = TaskController(taskRepo);
-const userController = UserController(userRepo, taskRepo);
+const taskController = TaskController(taskRepository);
+const userController = UserController(userRepository, taskRepository);
 
 const taskRouter = TaskRouter(taskController);
 const userRouter = UserRouter(userController);
@@ -34,5 +43,4 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
-// Export the app so your automated tests can still run
 module.exports = app;
