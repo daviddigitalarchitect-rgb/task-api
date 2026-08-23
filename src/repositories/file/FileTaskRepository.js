@@ -51,6 +51,12 @@ class FileTaskRepository extends ITaskRepository {
     return tasks;
   }
 
+
+  async findAndCount(queryOptions = {}) {
+    const tasks = await this.findAll(queryOptions);
+    return [tasks, tasks.length];
+  }
+
   async findById(id) {
     const tasks = await this._readTasks();
     return tasks.find(t => t.id === id) || null;

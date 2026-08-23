@@ -27,7 +27,6 @@ module.exports = new EntitySchema({
     userId: {
       type: 'uuid',
     },
-    
     createdAt: {
       type: 'timestamp',
       createDate: true,
@@ -36,5 +35,14 @@ module.exports = new EntitySchema({
       type: 'timestamp',
       updateDate: true, 
     }
+  },
+  // --- WE JUST ADDED THIS PART ---
+  relations: {
+    user: {
+      target: 'User', 
+      type: 'many-to-one', 
+      joinColumn: { name: 'userId' },
+      createForeignKeyConstraints: false, 
+    },
   },
 });

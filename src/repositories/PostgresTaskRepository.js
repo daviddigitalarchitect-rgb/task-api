@@ -1,78 +1,69 @@
-const { AppDataSource } = require('../db/postgres');
-const Task = require('../entities/Task');
+const { AppDataSource } = require("../db/postgres");
+const Task = require("../entities/Task");
 
 class PostgresTaskRepository {
-    constructor() {
-        this.repository = AppDataSource.getRepository(Task);
-    }
+  constructor() {
+    this.repository = AppDataSource.getRepository(Task);
+  }
 
-    async create(taskData) {
-        const newTask = this.repository.create(taskData);
-        return await this.repository.save(newTask);
-    }
+  async create(taskData) {
+    const newTask = this.repository.create(taskData);
+    return await this.repository.save(newTask);
+  }
 
-    async findAll(filters = {}) {
-        const queryOptions = {
-            where: {}, 
-        };
+  async findAndCount(queryOptions = {}) {
+    return await this.repository.findAndCount(queryOptions);
+  }
 
-        if (filters.status) {
-            queryOptions.where.done = filters.status === 'done';
-        }
-        if (filters.priority) {
-            queryOptions.where.priority = filters.priority;
-        }
+  async findById(id) {
+    return await this.repository.findOne({
+      where: { id: id },
+    });
+  }
 
-        if (filters.sortBy) {
-            const sortOrder = filters.order && filters.order.toLowerCase() === 'desc' ? 'DESC' : 'ASC';
-            queryOptions.order = {
-                [filters.sortBy]: sortOrder
-            };
-        } else {
-            queryOptions.order = { createdAt: 'DESC' };
-        }
+  async findByUserId(userId) {
+    return await this.repository.find({
+      where: { userId: userId },
+    });
+  }
 
-        if (filters.limit) {
-            const limit = parseInt(filters.limit, 10);
-            const page = parseInt(filters.page, 10) || 1;
+  async update(id, updateData) {
+    await this.repository.update(id, updateData);
+    return await this.findById(id);
+  }
 
-            queryOptions.take = limit;
-            queryOptions.skip = (page - 1) * limit;
-        }
+  async delete(id) {
+    const result = await this.repository.delete(id);
+    return result.affected > 0;
+  }
 
-        return await this.repository.find(queryOptions);
-    }
+  async markDone(id) {
+    await this.repository.update(id, { done: true });
+    return await this.findById(id);
+  }
 
-    async findById(id) {
-        return await this.repository.findOne({ 
-            where: { id: id } 
+  async bulkAssignTasks(taskIds, userId) {
+    await AppDataSource.transaction(async (transactionManager) => {
+      for (let i = 0; i < taskIds.length; i++) {
+        const taskId = taskIds[i];
+
+        const task = await transactionManager.findOne(Task, {
+          where: { id: taskId },
         });
-    }
 
-    async findByUserId(userId) {
-        return await this.repository.find({ 
-            where: { userId: userId } 
-        });
-    }
+        if (!task) {
+          throw new Error(`Task ${taskId} not found. Rollback successful.`);
+        }
 
-    async update(id, updateData) {
-        await this.repository.update(id, updateData);
-        return await this.findById(id);
-    }
+        task.userId = userId;
+        await transactionManager.save(Task, task);
+      }
+    });
+  }
 
-    async delete(id) {
-        const result = await this.repository.delete(id);
-        return result.affected > 0;
-    }
-
-    async markDone(id) {
-        await this.repository.update(id, { done: true });
-        return await this.findById(id);
-    }
-
-    async deleteAll() {
-        await this.repository.clear();
-    }
+  async deleteAll() {
+    await this.repository.clear();
+  }
 }
 
 module.exports = PostgresTaskRepository;

@@ -1,6 +1,6 @@
-require('dotenv').config();
-require('reflect-metadata'); 
-const { DataSource } = require('typeorm');
+require("dotenv").config();
+require("reflect-metadata");
+const { DataSource } = require("typeorm");
 
 // 1. Configure the connection
 const AppDataSource = new DataSource({
@@ -12,12 +12,9 @@ const AppDataSource = new DataSource({
       rejectUnauthorized: false,
     },
   },
-  synchronize: true, 
-  logging: false,
-  entities: [
-    require('../entities/User'),
-    require('../entities/Task')
-  ],
+  synchronize: true,
+  logging: true,
+  entities: [require("../entities/User"), require("../entities/Task")],
 });
 
 // 2. Create the function to start the connection

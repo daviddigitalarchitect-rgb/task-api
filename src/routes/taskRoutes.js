@@ -6,6 +6,7 @@ const TaskRouter = (taskController) => {
   router.post('/', taskController.createTask);
   router.get('/', taskController.getAllTasks);
   router.delete('/', taskController.deleteAllTasks);
+  router.post('/bulk-assign', taskController.bulkAssign);
   
   router.get('/:id', taskController.getTaskById);
   router.put('/:id', taskController.updateTask);
