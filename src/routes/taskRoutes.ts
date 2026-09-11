@@ -1,13 +1,13 @@
-const express = require('express');
+import express from 'express';
 
-const TaskRouter = (taskController) => {
+const TaskRouter = (taskController: any) => {
   const router = express.Router();
 
   router.post('/', taskController.createTask);
   router.get('/', taskController.getAllTasks);
   router.delete('/', taskController.deleteAllTasks);
   router.post('/bulk-assign', taskController.bulkAssign);
-  
+
   router.get('/:id', taskController.getTaskById);
   router.put('/:id', taskController.updateTask);
   router.delete('/:id', taskController.deleteTask);
@@ -16,4 +16,4 @@ const TaskRouter = (taskController) => {
   return router;
 };
 
-module.exports = TaskRouter;
+export default TaskRouter;

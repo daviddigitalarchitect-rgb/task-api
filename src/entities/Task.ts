@@ -1,6 +1,18 @@
-const { EntitySchema } = require('typeorm');
+import { EntitySchema } from 'typeorm';
 
-module.exports = new EntitySchema({
+export interface ITask {
+  id: string;
+  title: string;
+  description?: string;
+  priority?: string;
+  done: boolean;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user: any; 
+}
+
+export const Task = new EntitySchema<ITask>({
   name: 'Task',
   tableName: 'tasks',
   columns: {
@@ -14,7 +26,7 @@ module.exports = new EntitySchema({
     },
     description: {
       type: 'text',
-      nullable: true, 
+      nullable: true,
     },
     priority: {
       type: 'varchar',
@@ -22,7 +34,7 @@ module.exports = new EntitySchema({
     },
     done: {
       type: 'boolean',
-      default: false, 
+      default: false,
     },
     userId: {
       type: 'uuid',
@@ -33,16 +45,15 @@ module.exports = new EntitySchema({
     },
     updatedAt: {
       type: 'timestamp',
-      updateDate: true, 
+      updateDate: true,
     }
   },
-  // --- WE JUST ADDED THIS PART ---
   relations: {
     user: {
-      target: 'User', 
-      type: 'many-to-one', 
+      target: 'User',
+      type: 'many-to-one',
       joinColumn: { name: 'userId' },
-      createForeignKeyConstraints: false, 
+      createForeignKeyConstraints: false,
     },
   },
 });

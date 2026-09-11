@@ -1,12 +1,10 @@
-const ITaskRepository = require('../ITaskRepository');
-const fsPromises = require('fs').promises;
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+import { promises as fsPromises } from 'fs';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 const tasksFilePath = path.join(__dirname, '../../../tasks.json');
 
-class FileTaskRepository extends ITaskRepository {
-  
+export class FileTaskRepository {
   async _readTasks() {
     try {
       const data = await fsPromises.readFile(tasksFilePath, 'utf8');
@@ -16,30 +14,27 @@ class FileTaskRepository extends ITaskRepository {
     }
   }
 
-  async _writeTasks(tasks) {
+  async _writeTasks(tasks: any[]) {
     const stringifiedData = JSON.stringify(tasks, null, 2);
     await fsPromises.writeFile(tasksFilePath, stringifiedData, 'utf8');
   }
 
-  async findAll(filters = {}) {
+  async findAll(filters: any = {}) {
     let tasks = await this._readTasks();
 
-    // 1. Filtering
     if (filters.status) {
-      tasks = tasks.filter(t => t.status === filters.status);
+      tasks = tasks.filter((t: any) => t.status === filters.status);
     }
 
-    // 2. Sorting
     if (filters.sortBy) {
       const order = filters.order === 'desc' ? -1 : 1;
-      tasks.sort((a, b) => {
+      tasks.sort((a: any, b: any) => {
         if (a[filters.sortBy] < b[filters.sortBy]) return -1 * order;
         if (a[filters.sortBy] > b[filters.sortBy]) return 1 * order;
         return 0;
       });
     }
 
-    // 3. Pagination
     if (filters.page && filters.limit) {
       const page = parseInt(filters.page, 10);
       const limit = parseInt(filters.limit, 10);
@@ -51,23 +46,22 @@ class FileTaskRepository extends ITaskRepository {
     return tasks;
   }
 
-
-  async findAndCount(queryOptions = {}) {
+  async findAndCount(queryOptions: any = {}) {
     const tasks = await this.findAll(queryOptions);
     return [tasks, tasks.length];
   }
 
-  async findById(id) {
+  async findById(id: string) {
     const tasks = await this._readTasks();
-    return tasks.find(t => t.id === id) || null;
+    return tasks.find((t: any) => t.id === id) || null;
   }
 
-  async findByUserId(userId) {
+  async findByUserId(userId: string) {
     const tasks = await this._readTasks();
-    return tasks.filter(t => t.userId === userId);
+    return tasks.filter((t: any) => t.userId === userId);
   }
 
-  async create(taskData) {
+  async create(taskData: any) {
     const tasks = await this._readTasks();
     const newTask = {
       id: uuidv4(),
@@ -83,9 +77,9 @@ class FileTaskRepository extends ITaskRepository {
     return newTask;
   }
 
-  async update(id, updateData) {
+  async update(id: string, updateData: any) {
     const tasks = await this._readTasks();
-    const index = tasks.findIndex(t => t.id === id);
+    const index = tasks.findIndex((t: any) => t.id === id);
     
     if (index === -1) return null;
 
@@ -99,22 +93,22 @@ class FileTaskRepository extends ITaskRepository {
     return tasks[index];
   }
 
-  async markDone(id) {
-        const tasks = await this._readTasks();
-        const taskIndex = tasks.findIndex(t => t.id === id);
-
-        if (taskIndex === -1) return null;
-
-        tasks[taskIndex].done = true; 
-        tasks[taskIndex].updatedAt = new Date().toISOString();
-        await this._writeTasks(tasks);
-        
-        return tasks[taskIndex];
-    }
-
-  async delete(id) {
+  async markDone(id: string) {
     const tasks = await this._readTasks();
-    const filteredTasks = tasks.filter(t => t.id !== id);
+    const taskIndex = tasks.findIndex((t: any) => t.id === id);
+
+    if (taskIndex === -1) return null;
+
+    tasks[taskIndex].done = true; 
+    tasks[taskIndex].updatedAt = new Date().toISOString();
+    await this._writeTasks(tasks);
+    
+    return tasks[taskIndex];
+  }
+
+  async delete(id: string) {
+    const tasks = await this._readTasks();
+    const filteredTasks = tasks.filter((t: any) => t.id !== id);
     
     if (tasks.length === filteredTasks.length) return false; 
     
@@ -126,5 +120,3 @@ class FileTaskRepository extends ITaskRepository {
     await this._writeTasks([]);
   }
 }
-
-module.exports = FileTaskRepository;

@@ -1,23 +1,20 @@
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 // 1. Import the Building
-const app = require('./src/app');
+import app from './app';
 
 // 2. Import the Factory
-const { getRepositories } = require('./src/factory');
-
-const { connectDB } = require('./src/db/postgres');
-
+import { getRepositories } from './factory';
+import { connectDB } from './db/postgres';
 
 // 3. Import the Managers (Controllers)
-const TaskController = require('./src/controllers/taskController');
-const UserController = require('./src/controllers/userController');
+import TaskController from './controllers/taskController';
+import UserController from './controllers/userController';
 
 // 4. Import the Greeters (Routers)
-const TaskRouter = require('./src/routes/taskRoutes');
-const UserRouter = require('./src/routes/userRoutes');
-
-
+import TaskRouter from './routes/taskRoutes';
+import UserRouter from './routes/userRoutes';
 
 // --- THE WIRING ---
 if (process.env.DATA_SOURCE === 'postgres') {
@@ -35,7 +32,6 @@ const userRouter = UserRouter(userController);
 app.use('/tasks', taskRouter);
 app.use('/users', userRouter);
 
-
 // --- SERVER START ---
 if (process.env.NODE_ENV !== 'test') {
   app.listen(3000, () => {
@@ -43,4 +39,4 @@ if (process.env.NODE_ENV !== 'test') {
   });
 }
 
-module.exports = app;
+export default app;

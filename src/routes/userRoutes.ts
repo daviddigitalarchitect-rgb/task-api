@@ -1,6 +1,6 @@
 const express = require('express');
 
-const UserRouter = (userController) => {
+const UserRouter = (userController: any) => {
   const router = express.Router();
 
   router.post('/', userController.createUser);
@@ -12,4 +12,4 @@ const UserRouter = (userController) => {
   return router;
 };
 
-module.exports = UserRouter;
+export default UserRouter;

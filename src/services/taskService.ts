@@ -1,13 +1,13 @@
-const findTasks = async (filters, taskRepo) => {
-  const queryOptions = {
+export const findTasks = async (filters: any, taskRepo: any) => {
+  const queryOptions: any = {
     where: {},
     order: {},
   };
 
-  const filterMapping = {
-    status: (val) => ({ done: val === "done" }),
-    priority: (val) => ({ priority: val }),
-    assignedTo: (val) => ({ userId: val }),
+  const filterMapping: Record<string, (val: any) => any> = {
+    status: (val: any) => ({ done: val === "done" }),
+    priority: (val: any) => ({ priority: val }),
+    assignedTo: (val: any) => ({ userId: val }),
   };
 
   for (const [key, value] of Object.entries(filters)) {
@@ -32,11 +32,9 @@ const findTasks = async (filters, taskRepo) => {
   queryOptions.take = limit;
   queryOptions.skip = offset;
   
-  // This automatically does a SQL JOIN in exactly 1 query!
   if (filters.include === "user") {
     queryOptions.relations = ["user"];
   }
-  // --------------------------------------
 
   const [tasks, total] = await taskRepo.findAndCount(queryOptions);
 
@@ -52,5 +50,3 @@ const findTasks = async (filters, taskRepo) => {
     },
   };
 };
-
-module.exports = { findTasks };

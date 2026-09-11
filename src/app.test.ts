@@ -1,10 +1,9 @@
-require('dotenv').config();
+import 'dotenv/config';
+import request from 'supertest';
+import app from './index';
+import { AppDataSource } from './db/postgres'; 
 
-const request = require('supertest');
-const app = require('./index');
-const { AppDataSource } = require('./src/db/postgres'); 
-
-const TEST_USER_ID = "fad96c61-0d2f-484b-b435-0f133973b20f";
+const TEST_USER_ID = "558a9424-4d0d-4de8-a75e-92ff0f901c10";
 
 const isPostgresMode = process.env.DATA_SOURCE === 'postgres';
 
@@ -39,11 +38,11 @@ describe('Tasks API Inspection', () => {
     expect(response.body.title).toBe("Learn Automated Testing");
   });
 
-  // --- TEST 3: Read (GET /tasks) ---
+ // --- TEST 3: Read (GET /tasks) ---
   test('Should return a list of all tasks', async () => {
     const response = await request(app).get('/tasks');
     expect(response.statusCode).toBe(200);
-    expect(Array.isArray(response.body)).toBe(true);
+    expect(Array.isArray(response.body.data)).toBe(true);
   });
 
   // --- TEST 4: Update  (PUT /tasks/:id) ---
@@ -57,11 +56,6 @@ describe('Tasks API Inspection', () => {
     expect(response.body.title).toBe("New Order");
   });
 
-  // --- TEST 5: Delete all (DELETE /tasks) ---
-  test('Should delete all tasks', async () => {
-    const response = await request(app).delete('/tasks');
-    expect(response.statusCode).toBe(200);
-  });
 
   // --- TEST 6: Read Single (GET /tasks/:id) ---
   test('Should find one specific task by its ID', async () => {

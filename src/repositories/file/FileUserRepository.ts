@@ -1,12 +1,10 @@
-const IUserRepository = require('../IUserRepository');
-const fsPromises = require('fs').promises;
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+import { promises as fsPromises } from 'fs';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 const usersFilePath = path.join(__dirname, '../../../users.json');
 
-class FileUserRepository extends IUserRepository {
-  
+export class FileUserRepository {
   async _readUsers() {
     try {
       const data = await fsPromises.readFile(usersFilePath, 'utf8');
@@ -16,7 +14,7 @@ class FileUserRepository extends IUserRepository {
     }
   }
 
-  async _writeUsers(users) {
+  async _writeUsers(users: any[]) {
     const stringifiedData = JSON.stringify(users, null, 2);
     await fsPromises.writeFile(usersFilePath, stringifiedData, 'utf8');
   }
@@ -25,20 +23,20 @@ class FileUserRepository extends IUserRepository {
     return await this._readUsers();
   }
 
-  async findById(id) {
+  async findById(id: string) {
     const users = await this._readUsers();
-    return users.find(u => u.id === id) || null;
+    return users.find((u: any) => u.id === id) || null;
   }
 
-  async findByEmail(email) {
+  async findByEmail(email: string) {
     const users = await this._readUsers();
-    return users.find(u => u.email === email) || null;
+    return users.find((u: any) => u.email === email) || null;
   }
 
-  async create(userData) {
+  async create(userData: any) {
     const users = await this._readUsers();
 
-    if (users.some(u => u.email === userData.email)) {
+    if (users.some((u: any) => u.email === userData.email)) {
       throw new Error('User with this email already exists');
     }
 
@@ -53,9 +51,9 @@ class FileUserRepository extends IUserRepository {
     return newUser;
   }
 
-  async delete(id) {
+  async delete(id: string) {
     const users = await this._readUsers();
-    const filteredUsers = users.filter(u => u.id !== id);
+    const filteredUsers = users.filter((u: any) => u.id !== id);
     
     if (users.length === filteredUsers.length) return false; 
     
@@ -63,5 +61,3 @@ class FileUserRepository extends IUserRepository {
     return true;
   }
 }
-
-module.exports = FileUserRepository;
