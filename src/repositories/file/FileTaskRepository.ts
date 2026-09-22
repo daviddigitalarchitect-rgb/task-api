@@ -1,10 +1,11 @@
 import { promises as fsPromises } from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { ITaskRepository } from '../ITaskRepository';
 
 const tasksFilePath = path.join(__dirname, '../../../tasks.json');
 
-export class FileTaskRepository {
+export class FileTaskRepository implements ITaskRepository {
   async _readTasks() {
     try {
       const data = await fsPromises.readFile(tasksFilePath, 'utf8');

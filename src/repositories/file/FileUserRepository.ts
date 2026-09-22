@@ -1,10 +1,11 @@
 import { promises as fsPromises } from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import { IUserRepository } from '../IUserRepository'; 
 
 const usersFilePath = path.join(__dirname, '../../../users.json');
 
-export class FileUserRepository {
+export class FileUserRepository implements IUserRepository {
   async _readUsers() {
     try {
       const data = await fsPromises.readFile(usersFilePath, 'utf8');

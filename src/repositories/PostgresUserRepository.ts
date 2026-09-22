@@ -1,7 +1,8 @@
 import { AppDataSource } from '../db/postgres'; 
 import { User } from '../entities/User';
+import { IUserRepository } from './IUserRepository'; 
 
-export class PostgresUserRepository {
+export class PostgresUserRepository implements IUserRepository {
     repository: any;
 
     constructor() {
@@ -19,6 +20,10 @@ export class PostgresUserRepository {
 
     async findById(id: string) {
         return await this.repository.findOne({ where: { id: id } });
+    }
+    
+    async findByEmail(email: string) {
+       return await this.repository.findOne({ where: { email: email } });
     }
 
     async delete(id: string) {

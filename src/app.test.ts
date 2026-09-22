@@ -3,7 +3,7 @@ import request from 'supertest';
 import app from './index';
 import { AppDataSource } from './db/postgres'; 
 
-const TEST_USER_ID = "558a9424-4d0d-4de8-a75e-92ff0f901c10";
+let TEST_USER_ID = "";
 
 const isPostgresMode = process.env.DATA_SOURCE === 'postgres';
 
@@ -14,11 +14,23 @@ describe('Tasks API Inspection', () => {
       while (!AppDataSource.isInitialized) {
         await new Promise(resolve => setTimeout(resolve, 100));
       }
+      
+      // Automatically create a fresh user before tests run
+      const newUser = await AppDataSource.getRepository("User").save({
+        email: `test_${Date.now()}@example.com`,
+        password: "password123"
+      });
+      
+      TEST_USER_ID = newUser.id;
     }
-  });
+    }, 15000);
 
   afterAll(async () => {
     if (isPostgresMode && AppDataSource.isInitialized) {
+      // Delete the test user afterward to keep the database clean
+      if (TEST_USER_ID) {
+        await AppDataSource.getRepository("User").delete(TEST_USER_ID);
+      }
       await AppDataSource.destroy();
     }
   });
@@ -55,7 +67,6 @@ describe('Tasks API Inspection', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.title).toBe("New Order");
   });
-
 
   // --- TEST 6: Read Single (GET /tasks/:id) ---
   test('Should find one specific task by its ID', async () => {

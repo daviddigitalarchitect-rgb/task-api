@@ -17,3 +17,20 @@ After Adding Indexes:
 - Query 1: Index Scan | Execution time: 0.147ms (Scan changed and time dropped massively)
 - Query 2: Index Only Scan | Execution time: 8.53ms (Scan changed and time halved)
 - Query 3: Seq Scan | Execution time: 3.19ms (Database kept Seq Scan because table is small)
+
+
+
+
+
+
+
+
+
+# Database Index Performance Testing 
+
+| Dataset Size | Time WITHOUT Index (ms) | Time WITH Index (ms) |
+| :--- | :--- | :--- |
+| 1 Million | 79.4ms | 0.084ms |
+| 10 Million | 381ms | |
+| 50 Million | | |
+| 100 Million | | |

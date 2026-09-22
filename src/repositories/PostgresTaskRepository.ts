@@ -1,7 +1,8 @@
 import { AppDataSource } from '../db/postgres'; 
 import { Task } from '../entities/Task';
+import { ITaskRepository } from './ITaskRepository'; 
 
-export class PostgresTaskRepository {
+export class PostgresTaskRepository implements ITaskRepository {
     repository: any;
 
     constructor() {
@@ -42,5 +43,9 @@ export class PostgresTaskRepository {
     async delete(id: string) {
         const result = await this.repository.delete(id);
         return result.affected ? result.affected > 0 : false;
+    }
+    
+    async deleteAll() {
+        return await this.repository.clear(); 
     }
 }
